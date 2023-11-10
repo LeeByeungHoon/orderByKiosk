@@ -1,0 +1,76 @@
+name: github-action
+run-name: ${{ github.actor }} is out building GitHub Actions
+
+on:
+  push:
+    # Pattern matched against refs/tags
+    tags:        
+      - '**' 
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build Maven Projects
+        run: |
+          mvn clean package -f ./order/pom.xml
+          mvn clean package -f ./cook/pom.xml
+          mvn clean package -f ./table/pom.xml
+          mvn clean package -f ./orderstatus/pom.xml
+
+      - name: Docker Build and push for Order
+        uses: docker/build-push-action@v4
+        with:
+          context: ./order
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/order:latest
+            ghcr.io/${{ github.repository }}/order:${{ github.ref_name }}
+            
+      - name: Docker Build and push for Cook
+        uses: docker/build-push-action@v4
+        with:
+          context: ./cook
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/cook:latest
+            ghcr.io/${{ github.repository }}/cook:${{ github.ref_name }}
+            
+      - name: Docker Build and push for Table
+        uses: docker/build-push-action@v4
+        with:
+          context: ./table
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/table:latest
+            ghcr.io/${{ github.repository }}/table:${{ github.ref_name }}
+            
+      - name: Docker Build and push for Orderstatus
+        uses: docker/build-push-action@v4
+        with:
+          context: ./orderstatus
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/orderstatus:latest
+            ghcr.io/${{ github.repository }}/orderstatus:${{ github.ref_name }}
+            
