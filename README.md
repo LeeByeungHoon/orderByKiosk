@@ -1,91 +1,22 @@
-# 
+1. 도메인 주제 : 음식점 키오스크 주문
+1-1. 시나리오
+   - 사용자가 키오스크를 통해 주문을 한다
+   - 주문을 받아 요리를 시작하면 테이블이 비활성화가 된다
+   - 요리가 완료 되면 주문 상태를 변경한다
+   - 사용자가 주문을 취소한다
+   - 주문 취소 요청을 받은 요리사가 요리를 취소한다
+   - 취소가 되면 주문 상태를 변경하고 테이블을 활성화 한다
+   - 테이블이 활성화 되면 기다리고 있는 사용자에게 알림을 보낸
 
-## Model
-www.msaez.io/#/storming/kiosk-lbh
+2. 이벤트스토밍 모델
+![5](https://github.com/LeeByeungHoon/orderByKiosk/assets/103758785/c8455d19-0515-4a70-8d14-3cfb140f47eb)
 
-## Before Running Services
-### Make sure there is a Kafka server running
-```
-cd kafka
-docker-compose up
-```
-- Check the Kafka messages:
-```
-cd infra
-docker-compose exec -it kafka /bin/bash
-cd /bin
-./kafka-console-consumer --bootstrap-server localhost:9092 --topic
-```
+3. Domain Event Pub/Sub
+![스크린샷 2023-11-10 121418](https://github.com/LeeByeungHoon/orderByKiosk/assets/103758785/0a0b0e9e-b94c-4375-83d6-f63c51c478b3)
+![스크린샷 2023-11-10 112946](https://github.com/LeeByeungHoon/orderByKiosk/assets/103758785/e6dff1d9-fea4-46f8-b681-85a8e9ba26ff)
+![스크린샷 2023-11-10 121459](https://github.com/LeeByeungHoon/orderByKiosk/assets/103758785/9aa7a83c-2b4e-4ce6-b3a9-b2b0b44d18af)
+![스크린샷 2023-11-10 121242](https://github.com/LeeByeungHoon/orderByKiosk/assets/103758785/5b3c2036-5704-4b30-a16d-986a1147f259)
 
-## Run the backend micro-services
-See the README.md files inside the each microservices directory:
-
-- order
-- cook
-- table
-- orderstatus
-
-
-## Run API Gateway (Spring Gateway)
-```
-cd gateway
-mvn spring-boot:run
-```
-
-## Test by API
-- order
-```
- http :8088/orderManagements id="id" menuId="menuId" menuName="menuName" price="price" tableNo="tableNo" orderDt="orderDT" status="status" 
-```
-- cook
-```
- http :8088/cookingManagements id="id" orderId="orderId" menuName="menuName" menuId="menuId" tableNo="tableNo" cookingDt="cookingDT" status="status" 
-```
-- table
-```
- http :8088/tableManagements id="id" tableNo="tableNo" isActivate="isActivate" 
-```
-- orderstatus
-```
-```
-
-
-## Run the frontend
-```
-cd frontend
-npm i
-npm run serve
-```
-
-## Test by UI
-Open a browser to localhost:8088
-
-## Required Utilities
-
-- httpie (alternative for curl / POSTMAN) and network utils
-```
-sudo apt-get update
-sudo apt-get install net-tools
-sudo apt install iputils-ping
-pip install httpie
-```
-
-- kubernetes utilities (kubectl)
-```
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-```
-
-- aws cli (aws)
-```
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-```
-
-- eksctl 
-```
-curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-sudo mv /tmp/eksctl /usr/local/bin
-```
-
+CQRS
+![cqrs](https://github.com/LeeByeungHoon/orderByKiosk/assets/103758785/1314dd55-c158-4092-bd2c-d4e202e4a137)
+![cqrschange](https://github.com/LeeByeungHoon/orderByKiosk/assets/103758785/11ec2175-689c-45b3-9d0b-6d850f97cec5)
